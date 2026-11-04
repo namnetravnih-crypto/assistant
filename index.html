@@ -38,7 +38,7 @@
         .btn-secondary:hover { background-color: #52525b; }
         
         .upload-wrapper { position: relative; margin-bottom: 5px; }
-        #fileInput { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; z-index: -1; }
+        #fileInput { display: none; }
         
         .panel-section { border-top: 1px solid var(--border-color); padding-top: 15px; }
         .panel-section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
@@ -61,22 +61,22 @@
             position: relative;
         }
         
-        /* Глобальная оверлей-подсветка при перетаскивании файла в любую точку окна */
-        body.dragover-active ::after {
-            content: "Отпустите файл в любом месте для загрузки";
+        /* Исправленный слой оверлея подсказки */
+        #dragOverlay {
             position: fixed;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 3px dashed var(--accent-color);
-            background: rgba(26, 26, 30, 0.9);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26, 26, 30, 0.85);
+            border: 4px dashed var(--accent-color);
+            margin: 15px;
             border-radius: 12px;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 500;
-            z-index: 9999;
-            pointer-events: none;
+            z-index: 99999;
+            pointer-events: none; /* Защита от зависания мыши */
         }
 
         .canvas-container { 
@@ -108,6 +108,8 @@
 </head>
 <body>
 
+    <div id="dragOverlay">Отпустите файл в любом месте экрана для мгновенной загрузки</div>
+
     <header>
         <h1>STAMP STUDIO // PRO</h1>
         <div style="font-size: 0.85rem; color: var(--text-muted);">Вымышленные иллюстрации и реквизит</div>
@@ -117,7 +119,7 @@
         <div class="sidebar">
             <div class="upload-wrapper">
                 <button class="btn" id="uploadBtn" style="width: 100%;">📁 Загрузить файл</button>
-                <input type="file" id="fileInput" accept="image/*,application/pdf">
+                <input type="file" id="fileInput" accept="image/*">
             </div>
 
             <div class="panel-section">
@@ -168,13 +170,14 @@
     </div>
 
     <div class="status-bar">
-        <div id="statusText">Ожидание загрузки файла (нажмите кнопку или перетащите файл на экран)...</div>
+        <div id="statusText">Ожидание загрузки файла...</div>
         <div>Целевой размер: 40 мм (300 DPI)</div>
     </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
         const uploadBtn = document.getElementById('uploadBtn');
+        const dragOverlay = document.getElementById('dragOverlay');
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
         const statusText = document.getElementById('statusText');
@@ -186,8 +189,11 @@
         let currentMode = null; 
         let isDrawing = false;
 
-        // Починка клика по кнопке: связываем кастомный дизайн и нативный инпут
+        // Корректная привязка триггера загрузки окон проводника
         if (uploadBtn && fileInput) {
-            uploadBtn.addEventListener('click', (e) => {
-                e.preventDefault();
+            uploadBtn.addEventListener('click', () => {
                 fileInput.click();
+            });
+        }
+
+        const setupSlider = (id, valId, unit='') => {
