@@ -25,7 +25,7 @@
         .upload-wrapper { position: relative; width: 100%; }
         .upload-label { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: var(--accent-color); color: white; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; text-align: center; font-size: 1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
         .upload-label:hover { background-color: var(--accent-hover); }
-        #fileInput { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        #fileInput { display: none; } /* Спрятан корректно, вызывается программно */
         
         .btn { background-color: #3f3f46; color: white; border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; }
         .btn:hover { background-color: #52525b; border-color: #52525b; }
@@ -49,11 +49,13 @@
 
         .workspace { flex: 1; background-color: #0e0e11; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 30px; position: relative; }
         
-        .drop-zone-box { width: 480px; height: 320px; border: 2px dashed #4f46e5; background-color: #1c1c24; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text-main); transition: all 0.2s ease; padding: 20px; text-align: center; z-index: 10; }
+        /* Исправлено: окно Изначально Видимо и находится по центру */
+        .drop-zone-box { width: 480px; height: 320px; border: 2px dashed #4f46e5; background-color: #1c1c24; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text-main); transition: all 0.2s ease; padding: 20px; text-align: center; z-index: 10; display: flex; }
         .drop-zone-box.dragover { background-color: rgba(79, 70, 229, 0.15); border-color: #6366f1; transform: scale(1.02); }
         .drop-zone-box span { font-size: 1.1rem; font-weight: 500; }
         .drop-zone-box p { font-size: 0.85rem; color: var(--text-muted); max-width: 300px; line-height: 1.4; }
         
+        /* Холст скрыт до момента, пока картинка не загрузится */
         .canvas-container { position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.7); background-image: linear-gradient(45deg, #18181c 25%, transparent 25%), linear-gradient(-45deg, #18181c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #18181c 75%), linear-gradient(-45deg, transparent 75%, #18181c 75%); background-size: 20px 20px; border: 2px solid #27272a; border-radius: 4px; display: none; }
         canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
         
@@ -72,10 +74,11 @@
     <div class="main-container">
         <div class="sidebar">
             <div class="upload-wrapper">
-                <label class="upload-label" id="uploadLabel">
+                <!-- Исправлен тег: убран конфликт label, теперь клик обрабатывается чисто программно через ID -->
+                <div class="upload-label" id="uploadBtn">
                     <span>📁 Загрузить файл</span>
-                    <input type="file" id="fileInput" accept="image/*">
-                </label>
+                </div>
+                <input type="file" id="fileInput" accept="image/*">
             </div>
 
             <div class="panel-section">
@@ -131,8 +134,4 @@
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                     <button class="btn" id="btnMagicCursor" style="flex: 1;">🎯 Восстановление</button>
                     <button class="btn" id="btnEraser" style="flex: 1;">🧽 Ластик</button>
-                </div>
-                <div class="control-group">
-                    <label><span>Ширина / Размер</span><span id="valBrushSize">40 px</span></label>
-                    <input type="range" id="brushSize" min="5" max="180" value="40">
                 </div>
