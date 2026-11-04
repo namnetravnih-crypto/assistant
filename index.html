@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stamp Studio Pro — Инструмент для очистки оттисков</title>
+    <title>Stamp Studio Pro — Очистка оттисков</title>
     <style>
         :root {
-            --bg-color: #1a1a1e;
-            --panel-bg: #24242b;
+            --bg-color: #16161a;
+            --panel-bg: #222229;
             --accent-color: #4f46e5;
             --accent-hover: #6366f1;
             --text-main: #f3f4f6;
@@ -20,110 +20,104 @@
         
         header { 
             background-color: var(--panel-bg); 
-            padding: 15px 25px; 
+            padding: 12px 20px; 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
         }
-        header h1 { font-size: 1.2rem; font-weight: 600; color: #fff; }
+        header h1 { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
         
         .main-container { display: flex; flex: 1; overflow: hidden; }
 
-        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 18px; overflow-y: auto; }
+        /* Требование 11: Строгий, интуитивный дизайн боковой панели */
+        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 16px; overflow-y: auto; }
         
-        .btn { background-color: var(--accent-color); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; user-select: none; }
-        .btn:hover { background-color: var(--accent-hover); }
-        .btn-secondary { background-color: #3f3f46; border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background-color: #52525b; }
+        /* Требование 1: В левом верхнем углу размещена большая кнопка Загрузить файл */
+        .upload-wrapper { position: relative; width: 100%; }
+        .upload-label { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background-color: var(--accent-color); color: white; padding: 14px; 
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s ease;
+            text-align: center; font-size: 1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+        .upload-label:hover { background-color: var(--accent-hover); }
+        #fileInput { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         
-        .upload-wrapper { position: relative; margin-bottom: 5px; }
-        #fileInput { display: none; }
+        .btn { background-color: #3f3f46; color: white; border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; }
+        .btn:hover { background-color: #52525b; border-color: #52525b; }
+        .btn-main { background-color: #10b981; border: none; font-weight: 600; padding: 14px; font-size: 1rem; }
+        .btn-main:hover { background-color: #059669; }
         
-        .panel-section { border-top: 1px solid var(--border-color); padding-top: 15px; }
-        .panel-section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
+        .panel-section { border-top: 1px solid var(--border-color); padding-top: 14px; }
+        .panel-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
         
-        .control-group { margin-bottom: 14px; }
+        .control-group { margin-bottom: 12px; }
         .control-group label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #d1d5db; }
-        .control-group input[type="range"] { width: 100%; accent-color: var(--accent-color); background: #1e1e24; height: 6px; border-radius: 3px; outline: none; }
+        .control-group input[type="range"] { width: 100%; accent-color: var(--accent-color); background: #16161a; height: 6px; border-radius: 3px; outline: none; cursor: pointer; }
         
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; user-select: none; }
-        .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; }
+        .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
 
         .workspace { 
             flex: 1; 
-            background-color: #111113; 
+            background-color: #0e0e11; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             overflow: auto; 
-            padding: 20px;
+            padding: 30px;
             position: relative;
         }
         
-        /* Исправленный слой оверлея подсказки */
-        #dragOverlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(26, 26, 30, 0.85);
-            border: 4px dashed var(--accent-color);
-            margin: 15px;
-            border-radius: 12px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.5rem;
-            font-weight: 500;
-            z-index: 99999;
-            pointer-events: none; /* Защита от зависания мыши */
-        }
-
         .canvas-container { 
             position: relative; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
-            background-image: linear-gradient(45deg, #1b1b1f 25%, transparent 25%), linear-gradient(-45deg, #1b1b1f 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1b1b1f 75%), linear-gradient(-45deg, transparent 75%, #1b1b1f 75%); 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7); 
+            background-image: linear-gradient(45deg, #18181c 25%, transparent 25%), linear-gradient(-45deg, #18181c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #18181c 75%), linear-gradient(-45deg, transparent 75%, #18181c 75%); 
             background-size: 20px 20px; 
-            border: 1px solid #27272a; 
-            overflow: hidden;
+            border: 2px solid #27272a; 
+            border-radius: 4px;
         }
         
-        canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; }
+        canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
         
+        /* Требование 4: Настраиваемый круглый прозрачный курсор-маска */
         #brushCursor {
             position: absolute;
-            border: 2px dashed rgba(255, 255, 255, 0.6);
+            border: 2px dashed rgba(255, 255, 255, 0.8);
             background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             pointer-events: none;
             display: none;
             transform: translate(-50%, -50%);
-            z-index: 100;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+            z-index: 999;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
         }
         
-        .status-bar { background-color: var(--panel-bg); padding: 10px 25px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
-        .tool-active { border: 2px solid var(--accent-color) !important; background-color: #312e81 !important; color: #fff !important; }
+        .status-bar { background-color: var(--panel-bg); padding: 8px 20px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .tool-active { border: 1px solid var(--accent-hover) !important; background-color: rgba(79, 70, 229, 0.25) !important; color: #fff !important; }
     </style>
 </head>
 <body>
 
-    <div id="dragOverlay">Отпустите файл в любом месте экрана для мгновенной загрузки</div>
-
     <header>
         <h1>STAMP STUDIO // PRO</h1>
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Вымышленные иллюстрации и реквизит</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Иллюстрации и реквизит</div>
     </header>
 
     <div class="main-container">
         <div class="sidebar">
+            <!-- Пункт 1: Кнопка Загрузить файл в левом верхнем углу -->
             <div class="upload-wrapper">
-                <button class="btn" id="uploadBtn" style="width: 100%;">📁 Загрузить файл</button>
-                <input type="file" id="fileInput" accept="image/*">
+                <label class="upload-label" id="uploadLabel">
+                    <span>📁 Загрузить файл</span>
+                    <input type="file" id="fileInput" accept="image/*">
+                </label>
             </div>
 
+            <!-- Пункт 2: Удаление постороннего текста -->
             <div class="panel-section">
-                <div class="panel-section-title">Основная очистка</div>
+                <div class="panel-section-title">Фильтрация</div>
                 <div class="control-group">
                     <label class="checkbox-label">
                         <input type="checkbox" id="removeTextCheck">
@@ -132,36 +126,40 @@
                 </div>
             </div>
 
+            <!-- Пункт 3: 4 точечные ручные настройки для работы со сложными тенями/бликами -->
             <div class="panel-section">
-                <div class="panel-section-title">Точные настройки фона</div>
+                <div class="panel-section-title">Калибровка фона</div>
                 <div class="control-group"><label><span>Порог яркости</span><span id="val1">150</span></label><input type="range" id="paramBrightness" min="0" max="255" value="150"></div>
-                <div class="control-group"><label><span>Чувствительность к цвету</span><span id="val2">30</span></label><input type="range" id="paramChroma" min="0" max="100" value="30"></div>
+                <div class="control-group"><label><span>Чувствительность к цвету</span><span id="val2">35</span></label><input type="range" id="paramChroma" min="0" max="100" value="35"></div>
                 <div class="control-group"><label><span>Подавление свето-теней</span><span id="val3">40</span></label><input type="range" id="paramShadows" min="0" max="100" value="40"></div>
                 <div class="control-group"><label><span>Сглаживание краев</span><span id="val4">2</span></label><input type="range" id="paramSmoothing" min="0" max="10" value="2"></div>
             </div>
 
+            <!-- Пункт 4 и 5: Ручная маска, ластик с регулировкой (1-30 Мп эквивалент) и кнопка Отмена -->
             <div class="panel-section">
                 <div class="panel-section-title">Ручные инструменты</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                    <button class="btn btn-secondary" id="btnMagicCursor" style="flex: 1; padding: 8px; font-size: 0.85rem;">🎯 Круг-маска</button>
-                    <button class="btn btn-secondary" id="btnEraser" style="flex: 1; padding: 8px; font-size: 0.85rem;">🧽 Ластик</button>
+                    <button class="btn" id="btnMagicCursor" style="flex: 1;">🎯 Круг-маска</button>
+                    <button class="btn" id="btnEraser" style="flex: 1;">🧽 Ластик</button>
                 </div>
-                <div class="control-group"><label><span>Размер инструмента</span><span id="valBrushSize">25 px</span></label><input type="range" id="brushSize" min="1" max="250" value="25"></div>
-                <button class="btn btn-secondary" id="btnUndo" style="width: 100%; padding: 8px; font-size: 0.85rem;">↩️ Отменить последнее действие</button>
+                <div class="control-group"><label><span>Ширина / Размер</span><span id="valBrushSize">30 px</span></label><input type="range" id="brushSize" min="5" max="180" value="30"></div>
+                <button class="btn" id="btnUndo" style="width: 100%;">↩️ Отменить последнее действие</button>
             </div>
 
+            <!-- Пункт 6 и 10: Круглая печать и Эффект состаривания оттиска -->
             <div class="panel-section">
                 <div class="panel-section-title">Геометрия и эффекты</div>
-                <button class="btn btn-secondary" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start; font-size: 0.85rem;">⭕ Функция "Круглая печать"</button>
+                <button class="btn" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">⭕ Функция "Круглая печать"</button>
                 <div class="control-group"><label class="checkbox-label"><input type="checkbox" id="agingCheck"><span>Состаривание печати</span></label></div>
             </div>
 
+            <!-- Пункт 9: Кнопка скачать PNG -->
             <div class="panel-section" style="margin-top: auto; padding-top: 10px;">
-                <button class="btn" id="btnDownload" style="width: 100%; background-color: #10b981;">💾 Скачать PNG (40мм)</button>
+                <button class="btn btn-main" id="btnDownload" style="width: 100%;">💾 Скачать PNG (40мм)</button>
             </div>
         </div>
 
-        <div class="workspace" id="dropZone">
+        <div class="workspace" id="workspace">
             <div class="canvas-container" id="canvasContainer">
                 <div id="brushCursor"></div>
                 <canvas id="mainCanvas"></canvas>
@@ -170,30 +168,16 @@
     </div>
 
     <div class="status-bar">
-        <div id="statusText">Ожидание загрузки файла...</div>
-        <div>Целевой размер: 40 мм (300 DPI)</div>
+        <div id="statusText">Готов к работе. Перетащите файл в окно или нажмите кнопку загрузки.</div>
+        <div>Стандарт: 40 мм (PNG)</div>
     </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const dragOverlay = document.getElementById('dragOverlay');
+        const workspace = document.getElementById('workspace');
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
         const statusText = document.getElementById('statusText');
         const brushCursor = document.getElementById('brushCursor');
         const canvasContainer = document.getElementById('canvasContainer');
         
-        let originalImage = null;
-        let historyStack = [];
-        let currentMode = null; 
-        let isDrawing = false;
-
-        // Корректная привязка триггера загрузки окон проводника
-        if (uploadBtn && fileInput) {
-            uploadBtn.addEventListener('click', () => {
-                fileInput.click();
-            });
-        }
-
-        const setupSlider = (id, valId, unit='') => {
