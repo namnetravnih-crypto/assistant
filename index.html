@@ -28,12 +28,12 @@
         }
         header h1 { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
         
-        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .main-container { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* Требование 11: Строгий, интуитивный дизайн боковой панели */
-        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 16px; overflow-y: auto; }
+        /* Панель управления слева */
+        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 16px; overflow-y: auto; flex-shrink: 0; }
         
-        /* Требование 1: В левом верхнем углу размещена большая кнопка Загрузить файл */
+        /* Кнопка загрузки в верхнем левом углу */
         .upload-wrapper { position: relative; width: 100%; }
         .upload-label { 
             display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -59,6 +59,7 @@
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; user-select: none; }
         .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
 
+        /* Рабочая область справа */
         .workspace { 
             flex: 1; 
             background-color: #0e0e11; 
@@ -70,7 +71,7 @@
             position: relative;
         }
 
-        /* Новое выделенное окно для перетаскивания файлов мышкой */
+        /* Выделенная область для перетаскивания файлов мышкой */
         .drop-zone-box {
             width: 480px;
             height: 320px;
@@ -86,6 +87,7 @@
             transition: all 0.2s ease;
             padding: 20px;
             text-align: center;
+            z-index: 10;
         }
         .drop-zone-box.dragover {
             background-color: rgba(79, 70, 229, 0.15);
@@ -110,12 +112,12 @@
             background-size: 20px 20px; 
             border: 2px solid #27272a; 
             border-radius: 4px;
-            display: none; /* Скрыт, пока не загружен файл */
+            display: none; /* Скрыт по умолчанию до загрузки */
         }
         
         canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
         
-        /* Требование 4: Настраиваемый круглый прозрачный курсор-маска */
+        /* Круглый настраиваемый курсор-маска */
         #brushCursor {
             position: absolute;
             border: 2px dashed rgba(255, 255, 255, 0.8);
@@ -140,8 +142,8 @@
     </header>
 
     <div class="main-container">
+        <!-- Блок панели управления -->
         <div class="sidebar">
-            <!-- Пункт 1: Кнопка Загрузить файл в левом верхнем углу -->
             <div class="upload-wrapper">
                 <label class="upload-label" id="uploadLabel">
                     <span>📁 Загрузить файл</span>
@@ -149,7 +151,6 @@
                 </label>
             </div>
 
-            <!-- Пункт 2: Удаление постороннего текста -->
             <div class="panel-section">
                 <div class="panel-section-title">Фильтрация</div>
                 <div class="control-group">
@@ -160,7 +161,6 @@
                 </div>
             </div>
 
-            <!-- Пункт 3: 4 точечные ручные настройки для работы со сложными тенями/бликами -->
             <div class="panel-section">
                 <div class="panel-section-title">Калибровка фона</div>
                 <div class="control-group"><label><span>Порог яркости</span><span id="val1">150</span></label><input type="range" id="paramBrightness" min="0" max="255" value="150"></div>
@@ -169,7 +169,6 @@
                 <div class="control-group"><label><span>Сглаживание краев</span><span id="val4">2</span></label><input type="range" id="paramSmoothing" min="0" max="10" value="2"></div>
             </div>
 
-            <!-- Пункт 4 и 5: Ручная маска, ластик с регулировкой (1-30 Мп эквивалент) и кнопка Отмена -->
             <div class="panel-section">
                 <div class="panel-section-title">Ручные инструменты</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
@@ -180,11 +179,18 @@
                 <button class="btn" id="btnUndo" style="width: 100%;">↩️ Отменить последнее действие</button>
             </div>
 
-            <!-- Пункт 6 и 10: Круглая печать и Эффект состаривания оттиска -->
             <div class="panel-section">
                 <div class="panel-section-title">Геометрия и эффекты</div>
                 <button class="btn" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">⭕ Функция "Круглая печать"</button>
                 <div class="control-group"><label class="checkbox-label"><input type="checkbox" id="agingCheck"><span>Состаривание печати</span></label></div>
             </div>
 
-            <!-- Пункт 9: Кнопка скачать PNG -->
+            <div class="panel-section" style="margin-top: auto; padding-top: 10px;">
+                <button class="btn btn-main" id="btnDownload" style="width: 100%;">💾 Скачать PNG (40мм)</button>
+            </div>
+        </div>
+
+        <!-- Самостоятельный блок рабочей области (Workspace) -->
+        <div class="workspace" id="workspace">
+            <!-- Окно для перетаскивания файлов мышкой -->
+            <div class="drop-zone-box" id="dropZoneBox">
