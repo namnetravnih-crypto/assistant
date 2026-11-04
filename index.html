@@ -1,138 +1,207 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stamp Studio Pro — Очистка оттисков</title>
-    <style>
-        :root {
-            --bg-color: #16161a;
-            --panel-bg: #222229;
-            --accent-color: #4f46e5;
-            --accent-hover: #6366f1;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #3f3f46;
+    <!-- Оставляем всю вашу HTML разметку и CSS без изменений, меняем ТОЛЬКО скрипт ниже -->
+    <script>
+        // 1. Инициализация всех элементов интерфейса
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const canvasContainer = document.getElementById('canvasContainer');
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const brushCursor = document.getElementById('brushCursor');
+        
+        const paramBrightness = document.getElementById('paramBrightness');
+        const paramChroma = document.getElementById('paramChroma');
+        const paramShadows = document.getElementById('paramShadows');
+        const paramSmoothing = document.getElementById('paramSmoothing');
+        const removeTextCheck = document.getElementById('removeTextCheck');
+        const agingCheck = document.getElementById('agingCheck');
+        const brushSizeInput = document.getElementById('brushSize');
+        
+        const btnMagicCursor = document.getElementById('btnMagicCursor');
+        const btnEraser = document.getElementById('btnEraser');
+        const btnUndo = document.getElementById('btnUndo');
+        const btnMakeRound = document.getElementById('btnMakeRound');
+        const btnDownload = document.getElementById('btnDownload');
+        const detectedColorText = document.getElementById('detectedColorText');
+        const customColorPicker = document.getElementById('customColorPicker');
+
+        // Глобальное состояние
+        let originalImage = null;
+        let userDrawCanvas = document.createElement('canvas'); // Холст для масок
+        let userDrawCtx = userDrawCanvas.getContext('2d');
+        let historyStack = [];
+        let currentTool = null;
+        let isDrawing = false;
+        let stampTargetColor = { r: 0, g: 32, b: 160 };
+        let selectedColorMode = 'original';
+
+        // 2. Глобальное предотвращение открытия файлов браузером (Решение проблемы Drag & Drop)
+        window.addEventListener('dragover', e => e.preventDefault());
+        window.addEventListener('drop', e => e.preventDefault());
+
+        // Обработка зоны сброса
+        dropZone.addEventListener('dragenter', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer && e.dataTransfer.files.length) {
+                processImageFile(e.dataTransfer.files[0]); // Берём первый файл из сброшенных
+            }
+        });
+
+        // Исправление триггера клика: передаем конкретный файл, а не объект события!
+        fileInput.addEventListener('change', e => {
+            if (e.target.files && e.target.files.length) {
+                processImageFile(e.target.files[0]);
+            }
+        });
+
+        // Сброс значения инпута при клике, чтобы можно было загружать один и тот же файл по кругу
+        fileInput.addEventListener('click', () => {
+            fileInput.value = null;
+        });
+
+        // 3. Главная функция инициализации изображения
+        function processImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите файл изображения (PNG или JPG)!');
+                return;
+            }
+
+            const imgURL = URL.createObjectURL(file);
+            originalImage = new Image();
+            
+            originalImage.onload = function() {
+                // Синхронизируем размеры холстов
+                canvas.width = originalImage.width;
+                canvas.height = originalImage.height;
+                userDrawCanvas.width = originalImage.width;
+                userDrawCanvas.height = originalImage.height;
+                
+                // Заполняем слой ручной прорисовки нейтральным белым цветом
+                userDrawCtx.fillStyle = '#ffffff';
+                userDrawCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Отрисовываем старт
+                ctx.drawImage(originalImage, 0, 0);
+                
+                detectStampColor();
+                updateProcessing();
+                
+                // Очищаем старую историю и создаем точку сохранения
+                historyStack = [];
+                saveHistory();
+                
+                // Переключаем экраны интерфейса
+                dropZone.style.display = 'none';
+                canvasContainer.style.display = 'block';
+                
+                document.getElementById('statusText').innerText = `Файл успешно загружен: ${file.name}`;
+                document.getElementById('infoText').innerText = `${originalImage.width}x${originalImage.height} px`;
+                
+                URL.revokeObjectURL(imgURL);
+            };
+            originalImage.src = imgURL;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background-color: var(--panel-bg); padding: 12px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
-        
-        .main-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 16px; overflow-y: auto; flex-shrink: 0; }
-        
-        .upload-wrapper { position: relative; width: 100%; }
-        .upload-label { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: var(--accent-color); color: white; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; text-align: center; font-size: 1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
-        .upload-label:hover { background-color: var(--accent-hover); }
-        #fileInput { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        
-        .btn { background-color: #3f3f46; color: white; border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; }
-        .btn:hover { background-color: #52525b; border-color: #52525b; }
-        .btn-main { background-color: #10b981; border: none; font-weight: 600; padding: 14px; font-size: 1rem; margin-top: auto; }
-        .btn-main:hover { background-color: #059669; }
-        
-        .panel-section { border-top: 1px solid var(--border-color); padding-top: 14px; }
-        .panel-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
-        
-        .control-group { margin-bottom: 12px; }
-        .control-group label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #d1d5db; }
-        .control-group input[type=range] { width: 100%; accent-color: var(--accent-color); background: #16161a; height: 6px; border-radius: 3px; outline: none; cursor: pointer; }
-        .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; user-select: none; }
-        .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
-        
-        .color-presets { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px; }
-        .color-bubble { height: 32px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-        .color-bubble.active { border-color: #fff; transform: scale(1.05); }
-        .color-picker-wrapper { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #d1d5db; margin-top: 6px; }
-        .color-picker-wrapper input[type=color] { border: none; width: 30px; height: 24px; background: none; cursor: pointer; }
 
-        .workspace { flex: 1; background-color: #0e0e11; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 30px; position: relative; }
-        
-        .drop-zone-box { width: 480px; height: 320px; border: 2px dashed #4f46e5; background-color: #1c1c24; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text-main); transition: all 0.2s ease; padding: 20px; text-align: center; z-index: 10; }
-        .drop-zone-box.dragover { background-color: rgba(79, 70, 229, 0.15); border-color: #6366f1; transform: scale(1.02); }
-        .drop-zone-box span { font-size: 1.1rem; font-weight: 500; }
-        .drop-zone-box p { font-size: 0.85rem; color: var(--text-muted); max-width: 300px; line-height: 1.4; }
-        
-        .canvas-container { position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.7); background-image: linear-gradient(45deg, #18181c 25%, transparent 25%), linear-gradient(-45deg, #18181c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #18181c 75%), linear-gradient(-45deg, transparent 75%, #18181c 75%); background-size: 20px 20px; border: 2px solid #27272a; border-radius: 4px; display: none; }
-        canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
-        
-        #brushCursor { position: absolute; border: 2px dashed rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.15); border-radius: 50%; pointer-events: none; display: none; transform: translate(-50%, -50%); z-index: 999; box-shadow: 0 0 0 1px rgba(0,0,0,0.5); }
-        .status-bar { background-color: var(--panel-bg); padding: 8px 20px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
-        .tool-active { border: 1px solid var(--accent-hover) !important; background-color: rgba(79, 70, 229, 0.25) !important; color: #fff !important; }
-    </style>
-</head>
-<body>
+        // 4. Умный анализ цвета
+        function detectStampColor() {
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            let rSum = 0, gSum = 0, bSum = 0, count = 0;
+            let types = { blue: 0, red: 0, violet: 0 };
 
-    <header>
-        <h1>STAMP STUDIO PRO</h1>
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Иллюстрации и реквизит</div>
-    </header>
+            for (let i = 0; i < data.length; i += 16) {
+                let r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+                if (a < 200 || (r > 220 && g > 220 && b > 220)) continue;
 
-    <div class="main-container">
-        <div class="sidebar">
-            <div class="upload-wrapper">
-                <label class="upload-label" id="uploadLabel">
-                    <span>📁 Загрузить файл</span>
-                    <input type="file" id="fileInput" accept="image/*">
-                </label>
-            </div>
+                if (b > r + 25 && b > g + 15) { types.blue++; rSum += r; gSum += g; bSum += b; count++; }
+                else if (r > b + 25 && r > g + 25) { types.red++; rSum += r; gSum += g; bSum += b; count++; }
+                else if (Math.abs(r - b) < 40 && r > g + 25) { types.violet++; rSum += r; gSum += g; bSum += b; count++; }
+            }
 
-            <div class="panel-section">
-                <div class="panel-section-title">Фильтрация и автоцвет</div>
-                <div class="control-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="removeTextCheck" checked>
-                        <span>Удаление постороннего текста</span>
-                    </label>
-                </div>
-                <div style="font-size:0.8rem; color: var(--text-muted); margin-bottom:5px;" id="detectedColorText">
-                    Определенный цвет: не определен
-                </div>
-            </div>
+            if (count > 0) {
+                stampTargetColor = { r: Math.round(rSum/count), g: Math.round(gSum/count), b: Math.round(bSum/count) };
+                let max = Object.keys(types).reduce((a, b) => types[a] > types[b] ? a : b);
+                let labels = { blue: 'Синий', red: 'Красный', violet: 'Фиолетовый' };
+                detectedColorText.innerText = `Определенный цвет: ${labels[max]} [RGB: ${stampTargetColor.r},${stampTargetColor.g},${stampTargetColor.b}]`;
+            } else {
+                stampTargetColor = { r: 20, g: 50, b: 160 };
+                detectedColorText.innerText = `Цвет по умолчанию: Синий`;
+            }
+        }
 
-            <div class="panel-section">
-                <div class="panel-section-title">Смена цвета оттиска</div>
-                <div class="color-presets">
-                    <div class="color-bubble active" data-color="original" style="background: linear-gradient(45deg, #f00, #00f, #0f0);" title="Оригинал"></div>
-                    <div class="color-bubble" data-color="#0020a0" style="background: #0020a0;" title="Синий"></div>
-                    <div class="color-bubble" data-color="#900020" style="background: #900020;" title="Красный"></div>
-                    <div class="color-bubble" data-color="#702963" style="background: #702963;" title="Фиолетовый"></div>
-                    <div class="color-bubble" data-color="#111111" style="background: #111111;" title="Черный"></div>
-                </div>
-                <div class="color-picker-wrapper">
-                    <input type="color" id="customColorPicker" value="#4f46e5">
-                    <span>Свой цвет из палитры</span>
-                </div>
-            </div>
+        // 5. Основной конвейер пиксельной фильтрации
+        function updateProcessing() {
+            if (!originalImage) return;
+            
+            ctx.drawImage(originalImage, 0, 0);
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            
+            const maskData = userDrawCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+            
+            const thresh = parseInt(paramBrightness.value);
+            const chroma = parseInt(paramChroma.value);
+            const shadows = parseInt(paramShadows.value);
+            const removeText = removeTextCheck.checked;
+            
+            let targetRGB = selectedColorMode !== 'original' ? hexToRgb(selectedColorMode) : null;
 
-            <div class="panel-section">
-                <div class="panel-section-title">Калибровка фона</div>
-                <div class="control-group">
-                    <label><span>Порог яркости</span><span id="val1">180</span></label>
-                    <input type="range" id="paramBrightness" min="0" max="255" value="180">
-                </div>
-                <div class="control-group">
-                    <label><span>Чувствительность к цвету</span><span id="val2">45</span></label>
-                    <input type="range" id="paramChroma" min="0" max="100" value="45">
-                </div>
-                <div class="control-group">
-                    <label><span>Подавление свето-теней</span><span id="val3">30</span></label>
-                    <input type="range" id="paramShadows" min="0" max="100" value="30">
-                </div>
-                <div class="control-group">
-                    <label><span>Сглаживание краев</span><span id="val4">0</span></label>
-                    <input type="range" id="paramSmoothing" min="0" max="10" value="0">
-                </div>
-            </div>
+            for (let i = 0; i < data.length; i += 4) {
+                // Проверка ручного стирания (Ластик красит в буфер черный цвет #000)
+                if (maskData[i] === 0 && maskData[i+1] === 0 && maskData[i+2] === 0) {
+                    data[i+3] = 0;
+                    continue;
+                }
+                // Проверка ручного восстановления (Маска красит в буфер зеленый цвет #00ff00)
+                if (maskData[i] === 0 && maskData[i+1] === 255 && maskData[i+2] === 0) {
+                    continue; 
+                }
 
-            <div class="panel-section">
-                <div class="panel-section-title">Ручные инструменты</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                    <button class="btn" id="btnMagicCursor" style="flex: 1;">🎯 Круг-маска</button>
-                    <button class="btn" id="btnEraser" style="flex: 1;">🧽 Ластик</button>
-                </div>
-                <div class="control-group">
-                    <label><span>Ширина / Размер</span><span id="valBrushSize">40 px</span></label>
-                    <input type="range" id="brushSize" min="5" max="180" value="40">
-                </div>
+                let r = data[i], g = data[i+1], b = data[i+2];
+                let brightness = (r + g + b) / 3;
+
+                if (brightness >= thresh) { data[i+3] = 0; continue; }
+                if (r < shadows && g < shadows && b < shadows && !removeText) { data[i+3] = 0; continue; }
+
+                if (removeText) {
+                    let dist = Math.sqrt(Math.pow(r - stampTargetColor.r, 2) + Math.pow(g - stampTargetColor.g, 2) + Math.pow(b - stampTargetColor.b, 2));
+                    if (dist > chroma * 2.0 && (r < 120 && g < 120 && b < 120)) {
+                        data[i+3] = 0;
+                        continue;
+                    }
+                }
+
+                if (targetRGB && data[i+3] > 0) {
+                    data[i] = targetRGB.r; data[i+1] = targetRGB.g; data[i+2] = targetRGB.b;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+
+            let smooth = parseInt(paramSmoothing.value);
+            if (smooth > 0) {
+                ctx.globalCompositeOperation = 'source-atop';
+                ctx.filter = `blur(${smooth * 0.3}px)`;
+                ctx.drawImage(canvas, 0, 0);
+                ctx.filter = 'none';
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            if (agingCheck.checked) {
+                let currentData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let d = currentData.data;
+                for (let i = 0; i < d.length; i += 4) {
+                    if (d[i+3] > 0 && Math.random() < 0.15) {
+                        d[i+3] = Math.max(0, d[i+3] - Math.floor(Math.random() * 210));
+                    }
+                }
+                ctx.putImageData(currentData, 0, 0);
+            }
+        }
+
+        // Слушатели интерфейса
+        [paramBrightness, paramChroma, paramShadows, paramSmoothing].forEach(el => {
