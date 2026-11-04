@@ -69,6 +69,39 @@
             padding: 30px;
             position: relative;
         }
+
+        /* Новое выделенное окно для перетаскивания файлов мышкой */
+        .drop-zone-box {
+            width: 480px;
+            height: 320px;
+            border: 2px dashed #4f46e5;
+            background-color: #1c1c24;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            padding: 20px;
+            text-align: center;
+        }
+        .drop-zone-box.dragover {
+            background-color: rgba(79, 70, 229, 0.15);
+            border-color: #6366f1;
+            transform: scale(1.02);
+        }
+        .drop-zone-box span {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .drop-zone-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            line-height: 1.4;
+        }
         
         .canvas-container { 
             position: relative; 
@@ -77,6 +110,7 @@
             background-size: 20px 20px; 
             border: 2px solid #27272a; 
             border-radius: 4px;
+            display: none; /* Скрыт, пока не загружен файл */
         }
         
         canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
@@ -154,30 +188,3 @@
             </div>
 
             <!-- Пункт 9: Кнопка скачать PNG -->
-            <div class="panel-section" style="margin-top: auto; padding-top: 10px;">
-                <button class="btn btn-main" id="btnDownload" style="width: 100%;">💾 Скачать PNG (40мм)</button>
-            </div>
-        </div>
-
-        <div class="workspace" id="workspace">
-            <div class="canvas-container" id="canvasContainer">
-                <div id="brushCursor"></div>
-                <canvas id="mainCanvas"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="status-bar">
-        <div id="statusText">Готов к работе. Перетащите файл в окно или нажмите кнопку загрузки.</div>
-        <div>Стандарт: 40 мм (PNG)</div>
-    </div>
-
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const workspace = document.getElementById('workspace');
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        const statusText = document.getElementById('statusText');
-        const brushCursor = document.getElementById('brushCursor');
-        const canvasContainer = document.getElementById('canvasContainer');
-        
