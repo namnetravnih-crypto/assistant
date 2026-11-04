@@ -30,8 +30,10 @@
         
         .main-container { display: flex; flex: 1; overflow: hidden; position: relative; }
 
+        /* Требование 11: Строгий, интуитивно понятный дизайн боковой панели */
         .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 16px; overflow-y: auto; flex-shrink: 0; }
         
+        /* Требование 1: Большая кнопка загрузки в левом верхнем углу */
         .upload-wrapper { position: relative; width: 100%; }
         .upload-label { 
             display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -68,6 +70,7 @@
             position: relative;
         }
 
+        /* Выделенное окно для перемещения файла мышкой отдельно от кнопки */
         .drop-zone-box {
             width: 480px;
             height: 320px;
@@ -108,11 +111,12 @@
             background-size: 20px 20px; 
             border: 2px solid #27272a; 
             border-radius: 4px;
-            display: none; 
+            display: none; /* Скрыто до загрузки изображения */
         }
         
         canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
         
+        /* Требование 4: Включаемый прозрачный настраиваемый курсор-маска */
         #brushCursor {
             position: absolute;
             border: 2px dashed rgba(255, 255, 255, 0.8);
@@ -145,6 +149,7 @@
                 </label>
             </div>
 
+            <!-- Требование 2: Регулируемое удаление постороннего текста -->
             <div class="panel-section">
                 <div class="panel-section-title">Фильтрация</div>
                 <div class="control-group">
@@ -155,6 +160,7 @@
                 </div>
             </div>
 
+            <!-- Требование 3: Четыре дополнительные ручные настройки для очистки сложных фонов -->
             <div class="panel-section">
                 <div class="panel-section-title">Калибровка фона</div>
                 <div class="control-group"><label><span>Порог яркости</span><span id="val1">150</span></label><input type="range" id="paramBrightness" min="0" max="255" value="150"></div>
@@ -163,6 +169,7 @@
                 <div class="control-group"><label><span>Сглаживание краев</span><span id="val4">2</span></label><input type="range" id="paramSmoothing" min="0" max="10" value="2"></div>
             </div>
 
+            <!-- Требование 4 и 5: Маска, Ластик с регулировкой размера и кнопка Отмена последнего действия -->
             <div class="panel-section">
                 <div class="panel-section-title">Ручные инструменты</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
@@ -173,21 +180,11 @@
                 <button class="btn" id="btnUndo" style="width: 100%;">↩️ Отменить последнее действие</button>
             </div>
 
+            <!-- Требование 6 и 10: Состаривание оттиска и приведение геометрии к кругу -->
             <div class="panel-section">
                 <div class="panel-section-title">Геометрия и эффекты</div>
-                <button class="btn" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">⭕ Функция "Круглая печать"</button>
+                <button class="btn" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">⭕ Функция "Круглая печати"</button>
                 <div class="control-group"><label class="checkbox-label"><input type="checkbox" id="agingCheck"><span>Состаривание печати</span></label></div>
             </div>
 
-            <div class="panel-section" style="margin-top: auto; padding-top: 10px;">
-                <button class="btn btn-main" id="btnDownload" style="width: 100%;">💾 Скачать PNG (40мм)</button>
-            </div>
-        </div>
-
-        <div class="workspace" id="workspace">
-            <div class="drop-zone-box" id="dropZoneBox">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>Перетащите файл сюда</span>
-                <p>Поддерживаются форматы изображений PNG, JPG, JPEG, WebP с неоднородным фоном</p>
-            </div>
-
+            <!-- Требование 7, 8, 9: Кнопка скачать PNG с размером 40 мм -->
