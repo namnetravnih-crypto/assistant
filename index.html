@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StampExtractor Studio – Инструмент обработки графики</title>
+    <title>Stamp Studio Pro — Инструмент для очистки оттисков</title>
     <style>
         :root {
-            --bg-color: #1e1e24;
-            --panel-bg: #2a2a32;
+            --bg-color: #1a1a1e;
+            --panel-bg: #24242b;
             --accent-color: #4f46e5;
             --accent-hover: #6366f1;
             --text-main: #f3f4f6;
@@ -17,50 +17,103 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background-color: var(--panel-bg); padding: 15px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        
+        header { 
+            background-color: var(--panel-bg); 
+            padding: 15px 25px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         header h1 { font-size: 1.2rem; font-weight: 600; color: #fff; }
+        
         .main-container { display: flex; flex: 1; overflow: hidden; }
 
         /* Левая панель управления */
-        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 20px; overflow-y: auto; }
+        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 18px; overflow-y: auto; }
+        
         .btn { background-color: var(--accent-color); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
         .btn:hover { background-color: var(--accent-hover); }
         .btn-secondary { background-color: #3f3f46; border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: #52525b; }
+        
         .upload-wrapper { position: relative; margin-bottom: 5px; }
-        .upload-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        /* Инпут скрыт визуально, но активен для вызова через JS */
+        #fileInput { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; z-index: -1; }
+        
         .panel-section { border-top: 1px solid var(--border-color); padding-top: 15px; }
         .panel-section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
+        
         .control-group { margin-bottom: 14px; }
         .control-group label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #d1d5db; }
         .control-group input[type="range"] { width: 100%; accent-color: var(--accent-color); background: #1e1e24; height: 6px; border-radius: 3px; outline: none; }
+        
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; user-select: none; }
         .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; }
 
-        /* Центральная область */
-        .workspace { flex: 1; background-color: #141416; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 20px; }
-        .canvas-container { position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.5); background-image: linear-gradient(45deg, #1b1b1f 25%, transparent 25%), linear-gradient(-45deg, #1b1b1f 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1b1b1f 75%), linear-gradient(-45deg, transparent 75%, #1b1b1f 75%); background-size: 20px 20px; border: 1px solid #27272a; }
-        canvas { display: block; max-width: 100%; max-height: 80vh; object-fit: contain; }
-        .status-bar { background-color: var(--panel-bg); padding: 8px 25px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
-        .tool-active { border: 2px solid var(--accent-color) !important; background-color: #312e81 !important; }
+        /* Центральная интерактивная область */
+        .workspace { 
+            flex: 1; 
+            background-color: #111113; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: auto; 
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Визуальная подсветка при перетаскивании файла на рабочую область */
+        .workspace.dragover::after {
+            content: "Отпустите файл здесь для загрузки";
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 2px dashed var(--accent-color);
+            background: rgba(79, 70, 229, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 500;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .canvas-container { 
+            position: relative; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+            background-image: linear-gradient(45deg, #1b1b1f 25%, transparent 25%), linear-gradient(-45deg, #1b1b1f 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1b1b1f 75%), linear-gradient(-45deg, transparent 75%, #1b1b1f 75%); 
+            background-size: 20px 20px; 
+            border: 1px solid #27272a; 
+            cursor: crosshair;
+        }
+        canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; }
+        
+        .status-bar { background-color: var(--panel-bg); padding: 10px 25px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
+        .tool-active { border: 2px solid var(--accent-color) !important; background-color: #312e81 !important; color: #fff !important; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>StampExtractor Studio</h1>
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Разработка реквизита и графических ассетов</div>
+        <h1>STAMP STUDIO // PRO</h1>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Вымышленные иллюстрации и реквизит</div>
     </header>
 
     <div class="main-container">
         <div class="sidebar">
+            <!-- Требование 1: Большая кнопка загрузки в левом верхнем углу панели -->
             <div class="upload-wrapper">
-                <button class="btn" style="width: 100%;">📁 Загрузить файл</button>
+                <button class="btn" id="uploadBtn" style="width: 100%;">📁 Загрузить файл</button>
                 <input type="file" id="fileInput" accept="image/*,application/pdf">
             </div>
 
+            <!-- Требование 2: Удаление постороннего ахроматического текста -->
             <div class="panel-section">
-                <div class="panel-section-title">Умная фильтрация</div>
+                <div class="panel-section-title">Основная очистка</div>
                 <div class="control-group">
                     <label class="checkbox-label">
                         <input type="checkbox" id="removeTextCheck">
@@ -69,88 +122,64 @@
                 </div>
             </div>
 
+            <!-- Требование 3: 4 точечные настройки для точной ручной калибровки -->
             <div class="panel-section">
-                <div class="panel-section-title">Калибровка фона</div>
+                <div class="panel-section-title">Точные настройки фона</div>
                 <div class="control-group"><label><span>Порог яркости</span><span id="val1">150</span></label><input type="range" id="paramBrightness" min="0" max="255" value="150"></div>
                 <div class="control-group"><label><span>Чувствительность к цвету</span><span id="val2">30</span></label><input type="range" id="paramChroma" min="0" max="100" value="30"></div>
                 <div class="control-group"><label><span>Подавление свето-теней</span><span id="val3">40</span></label><input type="range" id="paramShadows" min="0" max="100" value="40"></div>
                 <div class="control-group"><label><span>Сглаживание краев</span><span id="val4">2</span></label><input type="range" id="paramSmoothing" min="0" max="10" value="2"></div>
             </div>
 
+            <!-- Требование 4, 5: Круг-маска, Ластик с регулировкой размера и кнопка Отмены -->
             <div class="panel-section">
-                <div class="panel-section-title">Ручная очистка</div>
+                <div class="panel-section-title">Ручные инструменты</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                    <button class="btn btn-secondary" id="btnMagicCursor" style="flex: 1; padding: 8px;">🎯 Круг-маска</button>
-                    <button class="btn btn-secondary" id="btnEraser" style="flex: 1; padding: 8px;">🧽 Ластик</button>
+                    <button class="btn btn-secondary" id="btnMagicCursor" style="flex: 1; padding: 8px; font-size: 0.85rem;">🎯 Круг-маска</button>
+                    <button class="btn btn-secondary" id="btnEraser" style="flex: 1; padding: 8px; font-size: 0.85rem;">🧽 Ластик</button>
                 </div>
                 <div class="control-group"><label><span>Размер инструмента</span><span id="valBrushSize">15 px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div>
-                <button class="btn btn-secondary" id="btnUndo" style="width: 100%; padding: 8px; font-size: 0.85rem;">↩️ Отменить действие</button>
+                <button class="btn btn-secondary" id="btnUndo" style="width: 100%; padding: 8px; font-size: 0.85rem;">↩️ Отменить последнее действие</button>
             </div>
 
+            <!-- Требование 6, 10: Круглая печать и Состаривание -->
             <div class="panel-section">
                 <div class="panel-section-title">Геометрия и эффекты</div>
-                <button class="btn btn-secondary" id="btnMakeRound" style="width: 100%; margin-bottom: 10px; justify-content: flex-start;">⭕ Функция "Круглая печать"</button>
+                <button class="btn btn-secondary" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start; font-size: 0.85rem;">⭕ Функция "Круглая печать"</button>
                 <div class="control-group"><label class="checkbox-label"><input type="checkbox" id="agingCheck"><span>Состаривание печати</span></label></div>
             </div>
 
-            <div class="panel-section" style="margin-top: auto; padding-top: 15px;">
-                <button class="btn" id="btnDownload" style="width: 100%; background-color: #10b981;">💾 Скачать PNG</button>
+            <!-- Требование 9: Кнопка скачать PNG -->
+            <div class="panel-section" style="margin-top: auto; padding-top: 10px;">
+                <button class="btn" id="btnDownload" style="width: 100%; background-color: #10b981;">💾 Скачать PNG (40мм)</button>
             </div>
         </div>
 
-        <div class="workspace">
-            <div class="canvas-container" id="canvasContainer"><canvas id="mainCanvas"></canvas></div>
+        <div class="workspace" id="dropZone">
+            <div class="canvas-container" id="canvasContainer">
+                <canvas id="mainCanvas"></canvas>
+            </div>
         </div>
     </div>
 
     <div class="status-bar">
-        <div id="statusText">Ожидание загрузки графического ассета...</div>
-        <div>Стандартизация: 40 мм (300 DPI)</div>
+        <div id="statusText">Ожидание загрузки файла (нажмите кнопку или перетащите файл на экран)...</div>
+        <div>Целевой размер: 40 мм (300 DPI)</div>
     </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const dropZone = document.getElementById('dropZone');
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
         const statusText = document.getElementById('statusText');
-        let originalImage = null, historyStack = [], currentMode = null;
+        
+        let originalImage = null;
+        let historyStack = [];
+        let currentMode = null; // 'magic' или 'eraser'
+        let isDrawing = false;
 
-        const setupSlider = (id, valId, unit='') => {
-            const slider = document.getElementById(id);
-            const display = document.getElementById(valId);
-            slider.addEventListener('input', () => { display.textContent = slider.value + unit; applyFilters(); });
-        };
-        setupSlider('paramBrightness', 'val1'); setupSlider('paramChroma', 'val2');
-        setupSlider('paramShadows', 'val3'); setupSlider('paramSmoothing', 'val4');
-        setupSlider('brushSize', 'valBrushSize', ' px');
-
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0]; if (!file) return;
-            statusText.textContent = `Загрузка: ${file.name}...`;
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    originalImage = img; canvas.width = img.width; canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0); saveToHistory(); applyFilters();
-                    statusText.textContent = `Файл загружен. Разрешение: ${img.width}x${img.height}px.`;
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function applyFilters() {
-            if (!originalImage) return;
-            ctx.drawImage(originalImage, 0, 0);
-            let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height), data = imgData.data;
-            const brightnessThresh = parseInt(document.getElementById('paramBrightness').value);
-            const removeText = document.getElementById('removeTextCheck').checked;
-            const aging = document.getElementById('agingCheck').checked;
-
-            for (let i = 0; i < data.length; i += 4) {
-                let r = data[i], g = data[i+1], b = data[i+2];
-                let brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-                let maxDiff = Math.max(Math.abs(r-g), Math.abs(g-b), Math.abs(b-r));
-
-                if (brightness > brightnessThresh) { data[i+3] = 0; continue; }
+        // Связываем кастомную кнопку с системным инпутом выбора файлов
+        if (uploadBtn && fileInput) {
+            uploadBtn.addEventListener('click', (e) => {
