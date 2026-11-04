@@ -29,7 +29,6 @@
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
-            position: relative;
         }
 
         header {
@@ -39,7 +38,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 10;
         }
 
         header h1 {
@@ -60,7 +58,6 @@
             display: flex;
             flex: 1;
             overflow: hidden;
-            position: relative;
         }
 
         /* Боковая панель управления */
@@ -73,7 +70,6 @@
             flex-direction: column;
             gap: 20px;
             overflow-y: auto;
-            z-index: 10;
         }
 
         .section-title {
@@ -165,11 +161,10 @@
             position: relative;
             background-image: radial-gradient(var(--border-color) 1px, transparent 0);
             background-size: 24px 24px;
-            z-index: 5;
         }
 
-        /* Кнопка-зона загрузки (Центральный блок) */
-        .upload-block {
+        /* Центральный блок загрузки */
+        .upload-center-box {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -178,58 +173,61 @@
             background: var(--panel-bg);
             border: 2px dashed #4b5563;
             border-radius: 16px;
-            padding: 40px 60px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
+            padding: 50px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             max-width: 500px;
             width: 100%;
             text-align: center;
+            transition: all 0.2s ease;
         }
 
-        .upload-block.dragover {
+        .upload-center-box.dragover {
             border-color: var(--accent-color);
             background: rgba(79, 70, 229, 0.1);
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
 
-        .btn-upload-trigger {
+        .btn-main-upload {
             background-color: var(--accent-color);
-            padding: 14px 28px;
-            font-size: 1.05rem;
+            color: white;
+            font-size: 1.1rem;
+            padding: 14px 32px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: auto;
         }
 
-        .btn-upload-trigger:hover {
+        .btn-main-upload:hover {
             background-color: var(--accent-hover);
         }
 
-        .upload-text-info {
+        .upload-info-text {
             color: var(--text-muted);
             font-size: 0.9rem;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         #fileInput {
             display: none;
         }
 
-        /* Кнопка "Заменить файл" после загрузки */
+        /* Кнопка "Выбрать другой файл" (вверху справа) */
         #btnResetFile {
             position: absolute;
             top: 20px;
             right: 20px;
             width: auto;
-            background: rgba(36, 41, 51, 0.8);
+            background: rgba(36, 41, 51, 0.9);
             border: 1px solid var(--border-color);
-            backdrop-filter: blur(4px);
             padding: 8px 16px;
             display: none;
-            z-index: 20;
-        }
-
-        #btnResetFile:hover {
-            background: #374151;
+            z-index: 100;
         }
 
         /* Контейнер для холста */
@@ -238,7 +236,7 @@
             display: none;
             max-width: 100%;
             max-height: 100%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
             background-image: linear-gradient(45deg, #2b323c 25%, transparent 25%), 
                               linear-gradient(-45deg, #2b323c 25%, transparent 25%), 
                               linear-gradient(45deg, transparent 75%, #2b323c 75%), 
@@ -323,3 +321,4 @@
 
             <div>
                 <div class="section-title">Стилизация</div>
+                <div class="control-group">
