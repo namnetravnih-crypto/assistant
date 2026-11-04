@@ -155,6 +155,22 @@
             cursor: not-allowed;
         }
 
+        /* Специальный блок загрузки в боковой панели */
+        .sidebar-upload-box {
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px dashed var(--accent-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .sidebar-upload-box p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            line-height: 1.3;
+        }
+
         /* Рабочая зона */
         .workspace {
             flex: 1;
@@ -168,72 +184,17 @@
             z-index: 5;
         }
 
-        /* Центральный блок загрузки */
-        .upload-center-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            background: var(--panel-bg);
-            border: 2px dashed #4b5563;
-            border-radius: 16px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            transition: all 0.2s ease;
-            z-index: 20;
-        }
-
-        .upload-center-box.dragover {
-            border-color: var(--accent-color);
-            background: rgba(79, 70, 229, 0.1);
-            transform: scale(1.02);
-        }
-
-        .btn-main-upload {
-            background-color: var(--accent-color);
-            color: white;
+        /* Текст-заглушка в центре экрана, если файл не загружен */
+        .placeholder-text {
             font-size: 1.1rem;
-            padding: 14px 32px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            width: auto;
-        }
-
-        .btn-main-upload:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .upload-info-text {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.5;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 400px;
         }
 
         #fileInput {
             display: none;
-        }
-
-        /* Кнопка "Выбрать другой файл" (вверху справа) */
-        #btnResetFile {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: auto;
-            background: rgba(36, 41, 51, 0.9);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            display: none;
-            z-index: 100;
         }
 
         /* Контейнер для холста */
@@ -258,20 +219,6 @@
             max-height: 75vh;
             object-fit: contain;
         }
-
-        /* Круглый курсор ластика */
-        #customCursor {
-            width: 40px;
-            height: 40px;
-            border: 2px solid rgba(239, 68, 68, 0.8);
-            background: rgba(239, 68, 68, 0.15);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            display: none;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
-        }
     </style>
 </head>
 <body>
@@ -284,10 +231,18 @@
     <div class="main-container">
         <!-- Панель управления -->
         <div class="sidebar">
+            
+            <!-- КНОПКА ЗАГРУЗКИ В ЛЕВОМ ВЕРХНЕМ УГЛУ НАД НАСТРОЙКАМИ -->
+            <div class="sidebar-upload-box">
+                <button class="primary" id="btnSidebarUpload">📁 Загрузить файл</button>
+                <p>Нажмите на кнопку или просто перетащите изображение/PDF в любое место экрана</p>
+                <input type="file" id="fileInput" accept="image/*,application/pdf">
+            </div>
+
             <div>
                 <div class="section-title">Основная очистка</div>
                 <div class="control-group" style="display: grid; gap: 10px;">
-                    <button id="btnRemoveText" class="primary" disabled>Удалить посторонний текст</button>
+                    <button id="btnRemoveText" class="primary" disabled>Удалить посторонний text</button>
                     <button id="btnMakeCircle" disabled>Коррекция в ровный круг</button>
                 </div>
             </div>
@@ -323,3 +278,26 @@
                         <button id="btnUndo" style="width: 70px;" title="Отмена действия" disabled>↩</button>
                     </div>
                 </div>
+            </div>
+
+            <div>
+                <div class="section-title">Стилизация</div>
+                <div class="control-group">
+                    <div class="flex-row">
+                        <label for="rangeAging">Интенсивность состаривания</label>
+                        <span class="range-val" id="valAging">40%</span>
+                    </div>
+                    <input type="range" id="rangeAging" min="10" max="90" value="40" disabled>
+                    <button id="btnAgeStamp" style="margin-top: 10px;" disabled>Состарить печать</button>
+                </div>
+            </div>
+
+            <div style="margin-top: auto;">
+                <button id="btnDownload" class="primary" style="background: #10b981;" disabled>
+                    <svg style="width:16px;height:16px;fill:white;" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Скачать PNG (40мм, 300 DPI)
+                </button>
+            </div>
+        </div>
+
+        <div class="workspace" id="workspace">
