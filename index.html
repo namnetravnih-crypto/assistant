@@ -29,6 +29,7 @@
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
         header {
@@ -38,6 +39,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 10;
         }
 
         header h1 {
@@ -58,6 +60,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            position: relative;
         }
 
         /* Боковая панель управления */
@@ -70,6 +73,7 @@
             flex-direction: column;
             gap: 20px;
             overflow-y: auto;
+            z-index: 10;
         }
 
         .section-title {
@@ -161,9 +165,10 @@
             position: relative;
             background-image: radial-gradient(var(--border-color) 1px, transparent 0);
             background-size: 24px 24px;
+            z-index: 5;
         }
 
-        /* Зона загрузки */
+        /* Зона загрузки на весь экран */
         .dropzone {
             width: 100%;
             max-width: 600px;
@@ -182,9 +187,10 @@
             padding: 20px;
         }
 
-        .dropzone:hover, .dropzone.dragover {
+        .dropzone.dragover {
             border-color: var(--accent-color);
-            background: rgba(79, 70, 229, 0.05);
+            background: rgba(79, 70, 229, 0.15);
+            transform: scale(1.02);
         }
 
         .dropzone svg {
@@ -192,6 +198,11 @@
             height: 64px;
             fill: var(--text-muted);
             margin-bottom: 15px;
+            pointer-events: none;
+        }
+
+        .dropzone p, .dropzone span {
+            pointer-events: none;
         }
 
         .dropzone p {
@@ -232,7 +243,7 @@
             object-fit: contain;
         }
 
-        /* Кастомный круглый курсор */
+        /* Круглый курсор ластика */
         #customCursor {
             width: 40px;
             height: 40px;
@@ -257,7 +268,6 @@
     <div class="main-container">
         <!-- Панель управления -->
         <div class="sidebar">
-            
             <div>
                 <div class="section-title">Основная очистка</div>
                 <div class="control-group" style="display: grid; gap: 10px;">
@@ -280,8 +290,6 @@
                         <span class="range-val" id="valSmoothness">1</span>
                     </div>
                     <input type="range" id="rangeSmoothness" min="0" max="5" value="1" disabled>
-                    
-                    <button id="btnApplySmartRemove" style="margin-top: 15px;" disabled>Применить настройки</button>
                 </div>
             </div>
 
@@ -309,8 +317,3 @@
                         <span class="range-val" id="valAging">40%</span>
                     </div>
                     <input type="range" id="rangeAging" min="10" max="90" value="40" disabled>
-                    <button id="btnAgeStamp" style="margin-top: 10px;" disabled>Состарить печать</button>
-                </div>
-            </div>
-
-            <div style="margin-top: auto;">
