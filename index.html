@@ -168,56 +168,68 @@
             z-index: 5;
         }
 
-        /* Зона загрузки на весь экран */
-        .dropzone {
-            width: 100%;
-            max-width: 600px;
-            height: 350px;
-            border: 2px dashed #4b5563;
-            border-radius: 12px;
+        /* Кнопка-зона загрузки (Центральный блок) */
+        .upload-block {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(36, 41, 51, 0.6);
-            backdrop-filter: blur(4px);
+            justify-content: center;
+            gap: 20px;
+            background: var(--panel-bg);
+            border: 2px dashed #4b5563;
+            border-radius: 16px;
+            padding: 40px 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            max-width: 500px;
+            width: 100%;
             text-align: center;
-            padding: 20px;
         }
 
-        .dropzone.dragover {
+        .upload-block.dragover {
             border-color: var(--accent-color);
-            background: rgba(79, 70, 229, 0.15);
-            transform: scale(1.02);
+            background: rgba(79, 70, 229, 0.1);
+            transform: scale(1.03);
         }
 
-        .dropzone svg {
-            width: 64px;
-            height: 64px;
-            fill: var(--text-muted);
-            margin-bottom: 15px;
-            pointer-events: none;
+        .btn-upload-trigger {
+            background-color: var(--accent-color);
+            padding: 14px 28px;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        .dropzone p, .dropzone span {
-            pointer-events: none;
+        .btn-upload-trigger:hover {
+            background-color: var(--accent-hover);
         }
 
-        .dropzone p {
-            font-size: 1.1rem;
-            color: var(--text-main);
-            margin-bottom: 5px;
-        }
-
-        .dropzone span {
-            font-size: 0.85rem;
+        .upload-text-info {
             color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         #fileInput {
             display: none;
+        }
+
+        /* Кнопка "Заменить файл" после загрузки */
+        #btnResetFile {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: auto;
+            background: rgba(36, 41, 51, 0.8);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(4px);
+            padding: 8px 16px;
+            display: none;
+            z-index: 20;
+        }
+
+        #btnResetFile:hover {
+            background: #374151;
         }
 
         /* Контейнер для холста */
@@ -311,9 +323,3 @@
 
             <div>
                 <div class="section-title">Стилизация</div>
-                <div class="control-group">
-                    <div class="flex-row">
-                        <label for="rangeAging">Интенсивность состаривания</label>
-                        <span class="range-val" id="valAging">40%</span>
-                    </div>
-                    <input type="range" id="rangeAging" min="10" max="90" value="40" disabled>
