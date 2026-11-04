@@ -30,16 +30,14 @@
         
         .main-container { display: flex; flex: 1; overflow: hidden; }
 
-        /* Левая панель управления */
         .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 18px; overflow-y: auto; }
         
-        .btn { background-color: var(--accent-color); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
+        .btn { background-color: var(--accent-color); color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; user-select: none; }
         .btn:hover { background-color: var(--accent-hover); }
         .btn-secondary { background-color: #3f3f46; border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: #52525b; }
         
         .upload-wrapper { position: relative; margin-bottom: 5px; }
-        /* Инпут скрыт визуально, но активен для вызова через JS */
         #fileInput { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; z-index: -1; }
         
         .panel-section { border-top: 1px solid var(--border-color); padding-top: 15px; }
@@ -52,7 +50,6 @@
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; user-select: none; }
         .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; }
 
-        /* Центральная интерактивная область */
         .workspace { 
             flex: 1; 
             background-color: #111113; 
@@ -64,21 +61,21 @@
             position: relative;
         }
         
-        /* Визуальная подсветка при перетаскивании файла на рабочую область */
-        .workspace.dragover::after {
-            content: "Отпустите файл здесь для загрузки";
-            position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
-            border: 2px dashed var(--accent-color);
-            background: rgba(79, 70, 229, 0.15);
-            border-radius: 8px;
+        /* Глобальная оверлей-подсветка при перетаскивании файла в любую точку окна */
+        body.dragover-active ::after {
+            content: "Отпустите файл в любом месте для загрузки";
+            position: fixed;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 3px dashed var(--accent-color);
+            background: rgba(26, 26, 30, 0.9);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 500;
-            z-index: 10;
+            z-index: 9999;
             pointer-events: none;
         }
 
@@ -88,9 +85,22 @@
             background-image: linear-gradient(45deg, #1b1b1f 25%, transparent 25%), linear-gradient(-45deg, #1b1b1f 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1b1b1f 75%), linear-gradient(-45deg, transparent 75%, #1b1b1f 75%); 
             background-size: 20px 20px; 
             border: 1px solid #27272a; 
-            cursor: crosshair;
+            overflow: hidden;
         }
+        
         canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; }
+        
+        #brushCursor {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+        }
         
         .status-bar { background-color: var(--panel-bg); padding: 10px 25px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
         .tool-active { border: 2px solid var(--accent-color) !important; background-color: #312e81 !important; color: #fff !important; }
@@ -105,13 +115,11 @@
 
     <div class="main-container">
         <div class="sidebar">
-            <!-- Требование 1: Большая кнопка загрузки в левом верхнем углу панели -->
             <div class="upload-wrapper">
                 <button class="btn" id="uploadBtn" style="width: 100%;">📁 Загрузить файл</button>
                 <input type="file" id="fileInput" accept="image/*,application/pdf">
             </div>
 
-            <!-- Требование 2: Удаление постороннего ахроматического текста -->
             <div class="panel-section">
                 <div class="panel-section-title">Основная очистка</div>
                 <div class="control-group">
@@ -122,7 +130,6 @@
                 </div>
             </div>
 
-            <!-- Требование 3: 4 точечные настройки для точной ручной калибровки -->
             <div class="panel-section">
                 <div class="panel-section-title">Точные настройки фона</div>
                 <div class="control-group"><label><span>Порог яркости</span><span id="val1">150</span></label><input type="range" id="paramBrightness" min="0" max="255" value="150"></div>
@@ -131,25 +138,22 @@
                 <div class="control-group"><label><span>Сглаживание краев</span><span id="val4">2</span></label><input type="range" id="paramSmoothing" min="0" max="10" value="2"></div>
             </div>
 
-            <!-- Требование 4, 5: Круг-маска, Ластик с регулировкой размера и кнопка Отмены -->
             <div class="panel-section">
                 <div class="panel-section-title">Ручные инструменты</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                     <button class="btn btn-secondary" id="btnMagicCursor" style="flex: 1; padding: 8px; font-size: 0.85rem;">🎯 Круг-маска</button>
                     <button class="btn btn-secondary" id="btnEraser" style="flex: 1; padding: 8px; font-size: 0.85rem;">🧽 Ластик</button>
                 </div>
-                <div class="control-group"><label><span>Размер инструмента</span><span id="valBrushSize">15 px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div>
+                <div class="control-group"><label><span>Размер инструмента</span><span id="valBrushSize">25 px</span></label><input type="range" id="brushSize" min="1" max="250" value="25"></div>
                 <button class="btn btn-secondary" id="btnUndo" style="width: 100%; padding: 8px; font-size: 0.85rem;">↩️ Отменить последнее действие</button>
             </div>
 
-            <!-- Требование 6, 10: Круглая печать и Состаривание -->
             <div class="panel-section">
                 <div class="panel-section-title">Геометрия и эффекты</div>
                 <button class="btn btn-secondary" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start; font-size: 0.85rem;">⭕ Функция "Круглая печать"</button>
                 <div class="control-group"><label class="checkbox-label"><input type="checkbox" id="agingCheck"><span>Состаривание печати</span></label></div>
             </div>
 
-            <!-- Требование 9: Кнопка скачать PNG -->
             <div class="panel-section" style="margin-top: auto; padding-top: 10px;">
                 <button class="btn" id="btnDownload" style="width: 100%; background-color: #10b981;">💾 Скачать PNG (40мм)</button>
             </div>
@@ -157,6 +161,7 @@
 
         <div class="workspace" id="dropZone">
             <div class="canvas-container" id="canvasContainer">
+                <div id="brushCursor"></div>
                 <canvas id="mainCanvas"></canvas>
             </div>
         </div>
@@ -170,16 +175,19 @@
     <script>
         const fileInput = document.getElementById('fileInput');
         const uploadBtn = document.getElementById('uploadBtn');
-        const dropZone = document.getElementById('dropZone');
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
         const statusText = document.getElementById('statusText');
+        const brushCursor = document.getElementById('brushCursor');
+        const canvasContainer = document.getElementById('canvasContainer');
         
         let originalImage = null;
         let historyStack = [];
-        let currentMode = null; // 'magic' или 'eraser'
+        let currentMode = null; 
         let isDrawing = false;
 
-        // Связываем кастомную кнопку с системным инпутом выбора файлов
+        // Починка клика по кнопке: связываем кастомный дизайн и нативный инпут
         if (uploadBtn && fileInput) {
             uploadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                fileInput.click();
