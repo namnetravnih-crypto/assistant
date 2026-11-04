@@ -14,52 +14,179 @@
             --text-muted: #9ca3af;
             --border-color: #3f3f46;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background-color: var(--panel-bg); padding: 12px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        
+        header { 
+            background-color: var(--panel-bg); 
+            padding: 12px 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         header h1 { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 0.5px; }
         
-        .main-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .sidebar { width: 340px; background-color: var(--panel-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; gap: 16px; overflow-y: auto; flex-shrink: 0; z-index: 20; }
+        .main-container { 
+            display: flex; 
+            flex: 1; 
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        .sidebar { 
+            width: 340px; 
+            background-color: var(--panel-bg); 
+            border-right: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px; 
+            gap: 16px; 
+            overflow-y: auto; 
+            flex-shrink: 0; 
+        }
         
         .upload-wrapper { position: relative; width: 100%; }
-        .upload-label { display: flex; align-items: center; justify-content: center; gap: 10px; background-color: var(--accent-color); color: white; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; text-align: center; font-size: 1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .upload-label { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background-color: var(--accent-color); color: white; padding: 14px; 
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s ease;
+            text-align: center; font-size: 1rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
         .upload-label:hover { background-color: var(--accent-hover); }
-        #fileInput { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        #fileInput { 
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            opacity: 0; 
+            cursor: pointer; 
+        }
         
-        .btn { background-color: #3f3f46; color: white; border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; }
+        .btn { 
+            background-color: #3f3f46; color: white; border: 1px solid var(--border-color); 
+            padding: 10px 15px; border-radius: 6px; font-weight: 500; cursor: pointer; 
+            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; 
+            gap: 8px; font-size: 0.9rem; 
+        }
         .btn:hover { background-color: #52525b; border-color: #52525b; }
-        .btn-main { background-color: #10b981; border: none; font-weight: 600; padding: 14px; font-size: 1rem; margin-top: auto; }
+        .btn-main { background-color: #10b981; border: none; font-weight: 600; padding: 14px; font-size: 1rem; }
         .btn-main:hover { background-color: #059669; }
         
         .panel-section { border-top: 1px solid var(--border-color); padding-top: 14px; }
-        .panel-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
+        .panel-section-title { 
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; 
+            color: var(--text-muted); margin-bottom: 12px; font-weight: 700; 
+        }
         
         .control-group { margin-bottom: 12px; }
-        .control-group label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #d1d5db; }
-        .control-group input[type=range] { width: 100%; accent-color: var(--accent-color); background: #16161a; height: 6px; border-radius: 3px; outline: none; cursor: pointer; }
+        .control-group label { 
+            display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #d1d5db; 
+        }
+        .control-group input[type=range] { 
+            width: 100%; accent-color: var(--accent-color); background: #16161a; 
+            height: 6px; border-radius: 3px; outline: none; cursor: pointer; 
+        }
+        
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; user-select: none; }
         .checkbox-label input { accent-color: var(--accent-color); width: 16px; height: 16px; cursor: pointer; }
-        
-        .color-presets { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px; }
-        .color-bubble { height: 32px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-        .color-bubble.active { border-color: #fff; transform: scale(1.05); }
-        .color-picker-wrapper { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #d1d5db; margin-top: 6px; }
-        .color-picker-wrapper input[type=color] { border: none; width: 30px; height: 24px; background: none; cursor: pointer; }
 
-        .workspace { flex: 1; background-color: #0e0e11; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 30px; position: relative; z-index: 10; }
+        .workspace { 
+            flex: 1; 
+            background-color: #0e0e11; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: auto; 
+            padding: 30px;
+            position: relative;
+        }
+
+        .drop-zone-box {
+            width: 480px;
+            height: 320px;
+            border: 2px dashed #4f46e5;
+            background-color: #1c1c24;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+        .drop-zone-box.dragover {
+            background-color: rgba(79, 70, 229, 0.15);
+            border-color: #6366f1;
+            transform: scale(1.02);
+        }
+        .drop-zone-box span {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .drop-zone-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            line-height: 1.4;
+        }
         
-        .drop-zone-box { width: 480px; height: 320px; border: 2px dashed #4f46e5; background-color: #1c1c24; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text-main); transition: all 0.2s ease; padding: 20px; text-align: center; }
-        .drop-zone-box.dragover { background-color: rgba(79, 70, 229, 0.15); border-color: #6366f1; transform: scale(1.02); }
-        .drop-zone-box span { font-size: 1.1rem; font-weight: 500; }
-        .drop-zone-box p { font-size: 0.85rem; color: var(--text-muted); max-width: 300px; line-height: 1.4; }
+        .canvas-container { 
+            position: relative; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7); 
+            background-image: linear-gradient(45deg, #18181c 25%, transparent 25%), linear-gradient(-45deg, #18181c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #18181c 75%), linear-gradient(-45deg, transparent 75%, #18181c 75%); 
+            background-size: 20px 20px; 
+            border: 2px solid #27272a; 
+            border-radius: 4px;
+            display: none; 
+        }
         
-        .canvas-container { position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.7); background-image: linear-gradient(45deg, #18181c 25%, transparent 25%), linear-gradient(-45deg, #18181c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #18181c 75%), linear-gradient(-45deg, transparent 75%, #18181c 75%); background-size: 20px 20px; border: 2px solid #27272a; border-radius: 4px; display: none; }
         canvas { display: block; max-width: 100%; max-height: 75vh; object-fit: contain; cursor: crosshair; }
         
-        #brushCursor { position: absolute; border: 2px dashed rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.15); border-radius: 50%; pointer-events: none; display: none; transform: translate(-50%, -50%); z-index: 999; box-shadow: 0 0 0 1px rgba(0,0,0,0.5); }
-        .status-bar { background-color: var(--panel-bg); padding: 8px 20px; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; }
-        .tool-active { border: 1px solid var(--accent-hover) !important; background-color: rgba(79, 70, 229, 0.25) !important; color: #fff !important; }
+        #brushCursor {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+            display: none;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
+        }
+        
+        .status-bar { 
+            background-color: var(--panel-bg); 
+            padding: 8px 20px; 
+            border-top: 1px solid var(--border-color); 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        .tool-active { 
+            border: 1px solid var(--accent-hover) !important; 
+            background-color: rgba(79, 70, 229, 0.25) !important; 
+            color: #fff !important; 
+        }
     </style>
 </head>
 <body>
@@ -70,7 +197,6 @@
     </header>
 
     <div class="main-container">
-        <!-- БОКОВАЯ ПАНЕЛЬ -->
         <div class="sidebar">
             <div class="upload-wrapper">
                 <label class="upload-label" id="uploadLabel">
@@ -80,58 +206,86 @@
             </div>
 
             <div class="panel-section">
-                <div class="panel-section-title">Фильтрация и автоцвет</div>
+                <div class="panel-section-title">Фильтрация</div>
                 <div class="control-group">
                     <label class="checkbox-label">
                         <input type="checkbox" id="removeTextCheck">
                         <span>Удаление постороннего текста</span>
                     </label>
                 </div>
-                <div style="font-size:0.8rem; color: var(--text-muted); margin-bottom:5px;" id="detectedColorText">
-                    Определенный цвет: не определен
-                </div>
-            </div>
-
-            <div class="panel-section">
-                <div class="panel-section-title">Смена цвета оттиска</div>
-                <div class="color-presets">
-                    <div class="color-bubble active" data-color="original" style="background: linear-gradient(45deg, #f00, #00f, #0f0);" title="Оригинал"></div>
-                    <div class="color-bubble" data-color="#0020a0" style="background: #0020a0;" title="Синий"></div>
-                    <div class="color-bubble" data-color="#900020" style="background: #900020;" title="Красный"></div>
-                    <div class="color-bubble" data-color="#702963" style="background: #702963;" title="Фиолетовый"></div>
-                    <div class="color-bubble" data-color="#111111" style="background: #111111;" title="Черный"></div>
-                </div>
-                <div class="color-picker-wrapper">
-                    <input type="color" id="customColorPicker" value="#4f46e5">
-                    <span>Свой цвет из палитры</span>
-                </div>
             </div>
 
             <div class="panel-section">
                 <div class="panel-section-title">Калибровка фона</div>
                 <div class="control-group">
-                    <label><span>Порог яркости</span><span id="val1">240</span></label>
-                    <input type="range" id="paramBrightness" min="0" max="255" value="240">
+                    <label><span>Порог яркости</span><span id="val1">150</span></label>
+                    <input type="range" id="paramBrightness" min="0" max="255" value="150">
                 </div>
                 <div class="control-group">
                     <label><span>Чувствительность к цвету</span><span id="val2">35</span></label>
                     <input type="range" id="paramChroma" min="0" max="100" value="35">
                 </div>
                 <div class="control-group">
-                    <label><span>Подавление свето-теней</span><span id="val3">15</span></label>
-                    <input type="range" id="paramShadows" min="0" max="100" value="15">
+                    <label><span>Подавление свето-теней</span><span id="val3">40</span></label>
+                    <input type="range" id="paramShadows" min="0" max="100" value="40">
                 </div>
                 <div class="control-group">
-                    <label><span>Сглаживание краев</span><span id="val4">0</span></label>
-                    <input type="range" id="paramSmoothing" min="0" max="10" value="0">
+                    <label><span>Сглаживание краев</span><span id="val4">2</span></label>
+                    <input type="range" id="paramSmoothing" min="0" max="10" value="2">
                 </div>
             </div>
 
             <div class="panel-section">
                 <div class="panel-section-title">Ручные инструменты</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                    <button class="btn" id="btnMagicCursor" style="flex: 1;">🎯 Восстановление</button>
+                    <button class="btn" id="btnMagicCursor" style="flex: 1;">🎯 Круг-маска</button>
                     <button class="btn" id="btnEraser" style="flex: 1;">🧽 Ластик</button>
                 </div>
                 <div class="control-group">
-                    <label><span>Ширина / Размер</span><span id="valBrushSize">40 px</span></label>
+                    <label><span>Ширина / Размер</span><span id="valBrushSize">30 px</span></label>
+                    <input type="range" id="brushSize" min="5" max="180" value="30">
+                </div>
+                <button class="btn" id="btnUndo" style="width: 100%;">↩️ Отменить последнее действие</button>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section-title">Геометрия и эффекты</div>
+                <button class="btn" id="btnMakeRound" style="width: 100%; margin-bottom: 12px; justify-content: flex-start;">⭕ Функция Круглая печать</button>
+                <div class="control-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agingCheck">
+                        <span>Состаривание печати</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Добавленные кнопки действий -->
+            <div class="panel-section">
+                <div class="panel-section-title">Экспорт</div>
+                <button class="btn-main" id="btnDownload" style="width: 100%;">⬇️ Скачать PNG (40 мм)</button>
+                <button class="btn" id="btnReset" style="width: 100%; margin-top: 8px;">🗑️ Сбросить всё</button>
+            </div>
+
+        </div>
+
+        <div class="workspace">
+            <div class="drop-zone-box" id="dropZone">
+                <span>Перетащите изображение сюда</span>
+                <p>или кликните по кнопке «Загрузить файл» в панели слева.</p>
+            </div>
+            <div class="canvas-container" id="canvasContainer">
+                <canvas id="mainCanvas"></canvas>
+                <div id="brushCursor"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+        <span>Готов к работе</span>
+        <span id="fileName"></span>
+    </div>
+
+    <!-- Подключаем логику -->
+    <script src="script.js"></script>
+</body>
+</html>
