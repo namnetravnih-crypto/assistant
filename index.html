@@ -38,6 +38,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 10;
         }
 
         header h1 {
@@ -58,6 +59,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            position: relative;
         }
 
         /* Боковая панель управления */
@@ -70,6 +72,8 @@
             flex-direction: column;
             gap: 20px;
             overflow-y: auto;
+            z-index: 10;
+            flex-shrink: 0;
         }
 
         .section-title {
@@ -161,6 +165,7 @@
             position: relative;
             background-image: radial-gradient(var(--border-color) 1px, transparent 0);
             background-size: 24px 24px;
+            z-index: 5;
         }
 
         /* Центральный блок загрузки */
@@ -179,6 +184,7 @@
             width: 100%;
             text-align: center;
             transition: all 0.2s ease;
+            z-index: 20;
         }
 
         .upload-center-box.dragover {
@@ -316,9 +322,3 @@
                         <button id="btnEraserMode" disabled>Включить ластик</button>
                         <button id="btnUndo" style="width: 70px;" title="Отмена действия" disabled>↩</button>
                     </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="section-title">Стилизация</div>
-                <div class="control-group">
