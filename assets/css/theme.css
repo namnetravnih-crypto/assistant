@@ -1,0 +1,47 @@
+/* Ассистент — общая тема: графит и шампанское золото */
+:root{
+  --bg:#0c0e13; --bg-2:#10131a; --panel:#151922; --panel-2:#1a1f2a; --panel-3:#212835;
+  --line:#2a3141; --line-2:#363e50;
+  --text:#ecebe5; --muted:#9aa2b1; --faint:#6d7585;
+  --gold:#c9a55c; --gold-2:#e4cc94; --gold-d:#8f7439; --gold-bg:rgba(201,165,92,.11);
+  --ok:#5fae8a; --warn:#d9b24a; --err:#cf6a5d;
+  --serif:'Cormorant Garamond','Playfair Display',Georgia,'Times New Roman',serif;
+  --sans:'Inter','Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --r:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--gold-2);text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* шапка */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:linear-gradient(180deg,#141923,#10131a);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;color:var(--text)}
+.brand .mark{width:30px;height:30px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:18px;color:var(--gold-2);font-weight:600}
+.brand b{font-family:var(--serif);font-size:22px;letter-spacing:.06em;font-weight:600}
+.brand small{display:block;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-top:-3px}
+.crumbs{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.crumbs a{color:var(--muted);border:1px solid var(--line);padding:6px 12px;border-radius:999px;transition:.15s}
+.crumbs a:hover{border-color:var(--gold-d);color:var(--gold-2)}
+.crumbs .here{color:var(--gold-2);letter-spacing:.04em}
+.training{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-d);padding:3px 10px;border-radius:999px;background:var(--gold-bg)}
+
+/* кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--panel-3);border:1px solid var(--line-2);color:var(--text);padding:9px 14px;border-radius:var(--r);cursor:pointer;font-weight:500;font-size:13.5px;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--gold-d);background:#262e3d}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary,.btn-main{background:linear-gradient(180deg,#d6b46c,#b48f45);border:1px solid #d9bb78;color:#16120a;font-weight:700;letter-spacing:.02em}
+.btn.primary:hover,.btn-main:hover{background:linear-gradient(180deg,#e2c382,#c19c50)}
+.btn-main{display:flex;width:100%;padding:13px;border-radius:var(--r);cursor:pointer;font-size:15px;justify-content:center}
+.btn.ghost{background:transparent}
+.btn.small{padding:6px 10px;font-size:12.5px}
+.tool-active{border-color:var(--gold)!important;background:var(--gold-bg)!important;color:var(--gold-2)!important;box-shadow:inset 0 0 0 1px var(--gold-d)}
+
+.hint{font-size:12px;color:var(--muted);line-height:1.5}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* всплывающие памятки */
+.tip-pop{position:fixed;z-index:9999;background:#f4efe0;color:#1b1608;border:1px solid var(--gold);border-radius:8px;padding:9px 12px;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:none;font-weight:500}
+.tip-pop[hidden]{display:none}
